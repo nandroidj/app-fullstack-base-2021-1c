@@ -1,10 +1,44 @@
 
 body {
-    display: flex;
-    min-height: 100vh;
-    flex-direction: column;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
 }
 
 main {
-    flex: 1 0 auto;
+  flex: 1 0 auto;
+}
+
+.card {
+  border-radius: 8px;
+}
+
+.card .card-content{
+  padding: 12px;
+}
+
+.card_title {
+  margin: 10px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.card_description {
+  margin: 10px;
+  text-align: center;
+}
+
+.card_controller label {
+  color: white;
+}
+
+.card_controller input[type=range] {
+  padding: 10px;
+  text-align: center;
+}
+
+.button {
+  margin: 6px;
+  margin: 4px;
 }

@@ -1,171 +1,179 @@
 class SmartHomeFramework {
-    
-    deviceList: Array<Device> = [];
 
-    deivceCardList: Array<DeviceCard> = [];
+    deviceList: Array<Device> = [];
+    deviceCardList: Array<DeviceCardForUi> = [];
 
 
     getElementById (id: string): HTMLElement {
         return document.getElementById(id);
     }
 
-    getElementByEvent (ev: Event): HTMLElement{
-        return <HTMLElement>ev.target;
+    getElementByEvent (event: Event): HTMLElement{
+        return <HTMLElement>event.target;
     }
 
-    getDeviceById (id: number): Device {
-
-        let ret: Device = undefined;
-
-        this.deviceList.forEach( device => 
-          {
-            if (device.id === id)
-                ret = device;
-          }
-        )
-
-        return ret;
-    }
-
-    getDeviceCardById (id: number): DeviceCard {
-       
-        let ret: DeviceCard = undefined;
-
-        this.deivceCardList.forEach( deviceCard => 
-          {
-            if (deviceCard.device.id === id)  ret = deviceCard;
-          }
-        )
-
-        return ret;
-    }
-
-    deleteDeviceById (id: number): void {
-
-      this.deviceList.map( device => {
-          if ( device.id === id ) this.deviceList.splice(device.id, 1)
-        }
-      )
-    }
-
-    deleteDeviceCardById (id: number): void {
-     
-      this.deivceCardList.map(deviceCard => {
-          if (deviceCard.device.id === id) this.deivceCardList.splice(deviceCard.device.id, 1);
-        }
-      )
-    }
-
-
-    requestGET (
+    requestGet (
       url: string, 
-      listener: GETResponseListener
+      listener: GetResponseListener
     ): void {
-     
-        let xhr: XMLHttpRequest;
-        xhr = new XMLHttpRequest;
+        
+        let request: XMLHttpRequest;
+        request = new XMLHttpRequest;
 
-        xhr.onreadystatechange = function() {
-    
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200)  listener.handleGETResponse(xhr.status, xhr.responseText);
-                else  listener.handleGETResponse(xhr.status, null);
+        request.onreadystatechange = function() {
+            if (request.readyState == 4) {
+                if (request.status == 200)
+                    listener.handleGetResponse(
+                      request.status, 
+                      request.responseText
+                    );
+                else
+                    listener.handleGetResponse(
+                      request.status, 
+                      null
+                    );
             } 
         }
 
-        xhr.open("GET", url, true);
-        xhr.send(null);
+        request.open("GET", url, true);
+        request.send(null);
     }
 
-
-    requestPOST (
+    requestPost (
       url: string, 
-      listener: POSTResponseListener, 
+      listener: PostResponseListener, 
       data: any
     ): void {
         
-        let xhr: XMLHttpRequest = new XMLHttpRequest;
+        let request: XMLHttpRequest = new XMLHttpRequest;
 
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200)  listener.handlePOSTResponse(xhr.status, xhr.responseURL, xhr.responseText);
-                else  listener.handlePOSTResponse(xhr.status, xhr.responseURL, null);
+        request.onreadystatechange = function() {
+            if (request.readyState == 4) {
+                if (request.status == 200)
+                    listener.handlePostResponse(
+                      request.status, 
+                      request.responseURL, 
+                      request.responseText
+                    );
+                else
+                    listener.handlePostResponse(
+                      request.status, 
+                      request.responseURL, 
+                      null
+                    );
             } 
         }
 
-        xhr.open("POST", url, true);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.send(JSON.stringify(data));
+        request.open("POST", url, true);
+        request.setRequestHeader("Content-Type", "application/json");
+        request.send( JSON.stringify(data) );
     }
 
-    requestPATCH (
+    requestDelete (
       url: string, 
-      listener: PATCHResponseListener, 
+      listener: DeleteResponseListener, 
       data: any
     ): void {
-    
-        let xhr: XMLHttpRequest = new XMLHttpRequest;
+        
+        let request: XMLHttpRequest = new XMLHttpRequest;
 
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200)  listener.handlePATCHResponse(xhr.status, xhr.responseText);
-                else  listener.handlePATCHResponse(xhr.status, null);
+        request.onreadystatechange = function() {
+            if (request.readyState == 4) {
+                if (request.status == 200)
+                    listener.handleDeleteResponse(
+                      request.status, 
+                      request.responseText
+                    );
+                else
+                    listener.handleDeleteResponse(
+                      request.status, 
+                      null
+                    );
             } 
         }
 
-        xhr.open("PATCH", url, true);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.send(JSON.stringify(data));
+        request.open("DELETE", url, true);
+        request.setRequestHeader("Content-Type", "application/json");
+        request.send( JSON.stringify(data) );
     }
 
-
-    requestDELETE (
+    requestPatch (
       url: string, 
-      listener: DELETEResponseListener, 
+      listener: PatchResponseListener, 
       data: any
     ): void {
-    
-        let xhr: XMLHttpRequest = new XMLHttpRequest;
+        
+        let request: XMLHttpRequest = new XMLHttpRequest;
 
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200)  listener.handleDELETEResponse(xhr.status, xhr.responseText);
-                else  listener.handleDELETEResponse(xhr.status, null);
+        request.onreadystatechange = function() {
+            if (request.readyState == 4) {
+                if (request.status == 200)
+                    listener.handlePatchResponse(
+                      request.status, 
+                      request.responseText
+                    );
+                else
+                    listener.handlePatchResponse(
+                      request.status, 
+                      null
+                    );
             } 
         }
 
-        xhr.open("DELETE", url, true);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.send(JSON.stringify(data));
+        request.open("PATCH", url, true);
+        request.setRequestHeader("Content-Type", "application/json");
+        request.send( JSON.stringify(data) );
+    }
+
+
+    getDeviceById (id: number): Device {
+        
+        let auxDevice: Device = undefined;
+
+        this.deviceList.map(
+          device => { if (device.id === id) auxDevice = device; }
+        )
+
+        return auxDevice;
+    }
+
+
+    getDeviceCardById (id: number): DeviceCardForUi {
+
+        let auxDevice: DeviceCardForUi = undefined;
+
+        this.deviceCardList.map(
+          uiComponent => { if (uiComponent.device.id === id) auxDevice = uiComponent; }
+        )
+
+        return auxDevice;
+    }
+
+    removeDeviceById (id: number): void {
+        this.deviceList.map(
+          device => { if(device.id === id) this.deviceList.splice(device.id, 1) }
+        )
+    }
+
+    removeUiComponentById (id: number): void {
+        this.deviceCardList.map(
+          device => { if(device.device.id === id) this.deviceCardList.splice(device.device.id, 1) }
+        )
     }
 }
 
-
-interface GETResponseListener {
-    handleGETResponse (
-      status: number, 
-      response: string
-    ): void;
+interface GetResponseListener {
+    handleGetResponse (status: number, response: string): void;
 }
 
-interface POSTResponseListener {
-    handlePOSTResponse (
-      status: number, 
-      url: string, 
-      response: string
-    ): void;
+interface PostResponseListener {
+    handlePostResponse (status: number, url: string, response: string): void;
 }
 
-interface PATCHResponseListener {
-    handlePATCHResponse (
-      status: number, 
-      response: string
-    ): void;
+interface DeleteResponseListener {
+    handleDeleteResponse (status: number, response: string): void;
 }
 
-interface DELETEResponseListener {
-    handleDELETEResponse (
-      status: number, 
-      response: string
-    ): void;
+interface PatchResponseListener {
+    handlePatchResponse (status: number, response: string): void;
 }

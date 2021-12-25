@@ -1,4 +1,4 @@
-import api from "./api"
+const api = require("./api");
 
 
 /**
@@ -46,7 +46,7 @@ module.exports = (app) => {
    * @description route en caso exitoso, borra el dispositivo segun el Id, e.o.c., HTTP status 400
   */
   app.delete("/devices/:id", [
-      api.deleteDevice
+      api.setDeleteDevice
   ])
 
   /**

@@ -1,4 +1,4 @@
-import deviceList from "./devices.json"
+const deviceList = require("./devices.json");
 
 
 /** type Device = {

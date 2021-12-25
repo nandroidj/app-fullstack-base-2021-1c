@@ -1,4 +1,4 @@
-import method from "./method"
+const method = require("./method");
 
 
 /**
@@ -105,7 +105,7 @@ exports.setModifyDevice = async (request, response) => {
 */
 exports.setDeleteDevice = async (request, response) => {
     try {
-        let deletedDevice = await method.setDeleteDevice( parseInt(request.params.id) );
+        letdeletedDevice = await method.setDeleteDevice( parseInt(request.params.id) );
         
         response
           .status(200)
