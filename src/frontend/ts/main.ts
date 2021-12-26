@@ -105,7 +105,6 @@ implements
 
                       let nameInput = <HTMLInputElement>this.smartHomeFramework.getElementById("modal_modify_device_name");
                       let descriptionInput = <HTMLInputElement>this.smartHomeFramework.getElementById("modal_modify_device_description");
-                      let iconInput = <HTMLSelectElement>this.smartHomeFramework.getElementById("modal_modify_device_icon");
                       
                       nameInput.value = device.name;
                       descriptionInput.value = device.description;

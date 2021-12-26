@@ -124,26 +124,31 @@ Los servicios de la aplicación se ejecutan sobre **contenedores de Docker**, as
 En la siguiente ilustración podés ver cómo está organizado el proyecto para que tengas en claro qué cosas hay en cada lugar.
 
 ```sh
-├── db                          # directorio de la DB
-│   ├── data                    # estructura y datos de la DB
-│   └── dumps                   # directorio de estructuras de la DB
-│       └── smart_home.sql      # estructura con la base de datos "smart_home"
-├── doc                         # documentacion general del proyecto
-└── src                         # directorio codigo fuente
-│   ├── backend                 # directorio para el backend de la aplicacion
-│   │   ├── index.js            # codigo principal del backend
-│   │   ├── mysql-connector.js  # codigo de conexion a la base de datos
-│   │   ├── package.json        # configuracion de proyecto NodeJS
-│   │   └── package-lock.json   # configuracion de proyecto NodeJS
-│   └── frontend                # directorio para el frontend de la aplicacion
-│       ├── js                  # codigo javascript que se compila automáticamente
-│       ├── static              # donde alojan archivos de estilos, imagenes, fuentes, etc.
-│       ├── ts                  # donde se encuentra el codigo TypeScript a desarrollar
-│       └── index.html          # archivo principal del cliente HTML
-├── docker-compose.yml          # archivo donde se aloja la configuracion completa
-├── README.md                   # este archivo
-├── CHANGELOG.md                # archivo para guardar los cambios del proyecto
-├── LICENSE.md                  # licencia del proyecto
+├── db                                  # directorio de la DB
+│   ├── data                            # estructura y datos de la DB
+│   └── dumps                           # directorio de estructuras de la DB
+│       └── smart_home.sql              # estructura con la base de datos "smart_home"
+├── doc                                 # documentacion general del proyecto
+└── src                                 # directorio codigo fuente
+│   ├── backend                         # directorio para el backend de la aplicacion
+│   │   ├── index.js                    # codigo principal del backend
+│   │   ├── mysql-connector.js          # codigo de conexion a la base de datos
+│   │   ├── package.json                # configuracion de proyecto NodeJS
+│   │   └── package-lock.json           # configuracion de proyecto NodeJS
+│   └── frontend                        # directorio para el frontend de la aplicacion
+│       ├── js                          # codigo javascript que se compila automáticamente
+│       ├── static                      # donde alojan archivos de estilos, imagenes, fuentes, etc.
+│       ├── ts                          # donde se encuentra el codigo TypeScript a desarrollar
+│       │   └── device.ts               # donde se define la clase Device con los campos: id, nombre, description, estado y tipo.
+│       │   └── devicecardforui.ts      # donde se define la clase DeviceCardForUi utilizando la biblioteca Materialize para la renderizacion del dispositivo.
+│       │   └── main.ts                 # donde se inicializa la aplicacion, se gestionan los eventos y se manejan las respuestas de cada solicitud. 
+│       │   └── smartHomeFramework.ts   # donde se definen los metodos que interaccionan con el Documen Object Model y con el back-end.
+│       │   └── tsConfig.ts             # donde se especifican los archivos raiz y las opciones de compilador.
+│       └── index.html                  # archivo principal del cliente HTML
+├── docker-compose.yml                  # archivo donde se aloja la configuracion completa
+├── readme.md                           # este archivo
+├── changelog.md                        # archivo para guardar los cambios del proyecto
+├── license.md                          # licencia del proyecto
 ```
 
 > No olvides ir poniendo tus cambios en el archivo `CHANGELOG.md` a medida que avanzas en el proyecto.
@@ -158,11 +163,106 @@ En esta sección podés ver los detalles específicos de funcionamiento del cód
 
 ### Agregar un dispositivo
 
-Completá los pasos para agregar un dispositivo desde el cliente web.
+1. Presionar el boton `Agregar dispositivo`.
+
+2. En efecto, aparece un modal en el cual hay que completar los campos correspondientes al tipo, el nombre, el detalle y el tipo de controlador del dispositivo.
+
+3. Seleccionar el boton de `Crear` y en consecuencia, se agrega una nueva tarjeta como ultimo item en el panel. En caso de optar por no agregar un dispositivo, oprimir el boton `Cancelar`.
+
+
+### Modificar un dispositivo
+
+1. Desde la tarjeta del dispositivo que se desea modificar, presionar el boton `Modificar dispositivo`.
+
+2. Aparece un modal similar al de agregar dispositivo en donde es posible modificar los campos descriptos anteriormente.
+
+3. Al presionar el boton `Modificar`, se cierra el modal y es posible observar la tarjeta del dispositivo con sus campos modificados.
+
+### Eliminar un dispositivo
+
+1. Desde la tarjeta del dispositivo que se desea modificar, presionar el boton `Eliminar dispositivo`.
+
+2. Actualizar la pagina y visualizar que el dispositivo ya no se encuentra en el panel.
+
 
 ### Frontend
 
-Completá todos los detalles sobre cómo armaste el frontend, sus interacciones, etc.
+A continuación, se presentan los archivos involucrados en el front-end con sus respectivas descripciones.
+
+#### Device
+
+Se define la clase `Device` que se encuentra en el archivo `src/frontend/ts/device.ts` con el fin de modelar los campos de cada dispositivo: 
+
+* `id`: identificador de tipo `number` que es asignado por el back-end
+* `name`: nombre de tipo `string`
+* `description`: descripción de tipo `string`
+* `state`: estado de tipo `number` condicionado a un intervalo entre cero y uno. Se contemplan los casos de interruptor, que toma los valores cero o uno, y dimer, que puede tomar diferentes valores.
+* `type`: tipo de controlador de tipo `number`. Se ofrece la opcion de interruptor o dimer.
+
+#### DeviceCardForUi
+
+La clase `DeviceCardForUi`, en `src/frontend/ts/deviceCardForUi.ts`, se define para renderizar cada dispositivo en el panel de control mediante el uso de la biblioteca *Materialize*.
+
+En primer lugar, se puede observar la instanciacion de la clase `Device` y se genera el codigo `HTML` necesario para renderizar la tarjeta correspondiente. Luego, se encuenta los metodos `append` y `modifyDevice`, correspondientes a agregar y modificar cada dispositivo. 
+
+Finalmente, la clase **DeviceCard** se la utiliza para representar un dispositivo en HTML. Al crear una instancia, se le pasa una instancia de la clase `Device` y genera el código HTML necesario para dibujar una card que la represente. Luego, mediante el método `attach` de la clase `DeviceCard` se le indica a qué elemento del DOM se debe agregar este código HTML de la `DeviceCard`. También incluye el método `changeDevice` para volver a generar el código HTML de la card cuando cambia la instancia de `Device` que tiene que representar.
+
+#### SmartHomeFramework
+
+La classe `SmartHomeFramework`, en `src/frontend/ts/smartHomeFramework.ts`, crea instancias de *arrays* de las clases mencionadas anteriormente y los metodos correspondientes a para la obtencion, el posteo, el patch y la supresion de elementos del *DOM*.
+
+#### Main
+
+En el archivo `src/frontend/ts/main.ts` se encuentra el corazon del front-end. En la misma, se encuentran implementadas las siguientes tareas:
+
+* **Metodo** [`main`]: es el metodo en el cual se realizan las tareas de inicializacion del framework y en caso deseable del dispositivo a modificar; a su vez cuenta con el procedimiento para obtener el elemnto de interes segun el identificador mediante el uso del *event listener*.
+
+* **Eventos** [`handleEvent`]: es el encargado de gestionar los eventos a partir de un evento del tipo `click`. En especial, sucede dentro del componente `div` que cuenta con el identificador `main_container_devices`. 
+
+A continuación, se presentan los eventos que puedan realizar a partir del evento `click`:
+
+1. `newDevice`: al clickear el boton `Agregar dispositivo`, se expone el modal `modal_new_device` donde se completan los campos para agregar un nuevo dispositivo.
+
+2. `modal_new_device_create`: al seleccionar el boton `Crear` en el modal para agregar un dispositivo, se obtiene el contenido de la clase `Device` y se realiza un **POST** con direccion al back-end.  
+
+3. `modal_modify_device_modify`: al oprimir el boton modificar, se ofrece el `modal_modify_device` permitiendo alterar los campos de un dispositivo ya registrado. Nuevamente, se recuperan los nuevos datos del dispositivo y en este caso, se realiza un **PATCH**.
+
+
+* Por otro lado, cada tarjeta (*DeviceCardForUi*) cuenta con el formato `option_id` tal que, es posible realizar las siguientes acciones a partir del identificador:  
+
+1. `modify`: al clickear en el boton `Modificar dispositivo`, se puede observar el modal `modal_modify_device` donde se almacena la referencia al dispositivo `deviceToModify` para su posterior procesamiento y los campos que el usuario desea modificar.   
+
+2. `delete`: al oprimir el boton `Eliminar dispositivo`, se realiza un **DELETE**, a la url `localhost:port_number/devices/id`, de `DeviceCardForUi` tal que se pueda borrar en el back-end.
+
+3. `switch`: al presionar el `toggle` del dispositivo configurado con el tipo de controlador **interruptor**, se modifica el estado del dispositivo al realizar un **POST** al endpoint `/devices/state`.
+
+4. `slider`: al modificar el `slider` del dispositivo configurado con el tipo de controlador **dimer**, se modifica el estado del dispositivo al realizar un **POST** al endpoint `/devices/state`.
+
+
+Por ultimo, se encuentra el manejo de los diferentes metodos *HTTP* a partir de la abstraccion de los metodos definidos en la clase *smartHomeFramework* en la cual se utilizan *callbacks*:
+
+1. `handleGetResponse`: procesa el *array[] = List* con los dispositivos existentes la respuesta del metodo **GET** que se envia al endpoint `/devices`. En efecto, para cada dispositivo crea una instancia de `DeviceCardForUi` y el componente correspondiente para insertarse en el panel de control.
+
+2. `handlePostResponse`: procesa la respuesta del metodo **POST** del endpoint `/devices` para agregar un dispositivo. Del cuerpo de la respuesta se obtienen los campos del dispositivo creado de modo que se instancia la clase `DeviceCardForUi` y se agrega al panel de control.
+
+3. `handleDeleteResponse`: procesa la respuesta del metodo **DELETE** del endpoint `/devices/:id`, tal que se suprime la tarjeta en el panel de control.
+
+4. `handlePatchResponse`: procesa la respuesta del metodo **PATCH** del endpoint `/devices`, el cual a partir del objeto recuperado se modifica el `DeviceCardForUi`. 
+  
+
+#### Indice
+
+El archivo `src/frontend/index.html`, contiene el andamiaje del panel de control que se encuentra distribuida de la siguiente manera segun sus identificadores: 
+
+* `newDevice`: hay un boton que contienen este identificador y permite la visualizacion del modal para agregar un dispositivo.
+
+* `main_container_device_list`: en un componente `div` se defined el id que contiene las tarjetas de los dispositivos y los modales para agregar y/o modificar un dispositivo en el panel de control.
+
+* `modal_new_device`: en un `div` se define este identificador para renderizar el modal destinado a agregar un nuevo dispositivo.
+
+* `modal_modify_device`: en otro `div` se define el id destinado al modal para modificar un dispositivo ya agregado en el panel de control.
+
+
 
 ### Backend
 
