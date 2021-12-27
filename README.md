@@ -131,6 +131,11 @@ En la siguiente ilustración podés ver cómo está organizado el proyecto para 
 ├── doc                                 # documentacion general del proyecto
 └── src                                 # directorio codigo fuente
 │   ├── backend                         # directorio para el backend de la aplicacion
+│   │   ├── smartHome                   # directorio secundario del backend
+│   │   │   └── api.js                  # interfaz para consumo de los getters y setters que presenta la aplicacion 
+│   │   │   └── device.json             # archivo que contiene la fuenta de informacion de cada dispositivo 
+│   │   │   └── method.js               # archivo que contiene cada metodo a utilizar en la aplicacion
+│   │   │   └── router.js               # archivo que permite el enrutamiento de cada metodo http con su respectivo endpoint y metodo.
 │   │   ├── index.js                    # codigo principal del backend
 │   │   ├── mysql-connector.js          # codigo de conexion a la base de datos
 │   │   ├── package.json                # configuracion de proyecto NodeJS
@@ -266,31 +271,267 @@ El archivo `src/frontend/index.html`, contiene el andamiaje del panel de control
 
 ### Backend
 
-Completá todos los detalles de funcionamiento sobre el backend, sus interacciones con el cliente web, la base de datos, etc.
+Por medio de una *API* **REST**, se desarolla la parte faltante del *back-end* para completar la aplicación. La misma es posible encontrarla en `src/backend/smartHome/` y cuenta con los siguientes archivos:
+
+* `devices.json`: es un archivo de texto plano que contiene un total de 8 objetos los cuales son utilizados para crear los dispositivos.
+
+* `model.js`: contiente todos los *getters* y *setters* que permiten la interaccion con la fuenta de datos (memoria no persistente) o la base de datos (memoria persistente).  
+
+* `api.js`: es una abstraccion de cada *getter* y *setter* definido en `model.js` y a su vez gestiona el metodo *HTTP* que recibe del *endpoint* propuesto en `router.js`.
+
+* `router.js`: es el archivo donde se define el *endpoint* y el metodo a consumir que expone la *API* para cada metodo *HTTP*. 
+
 
 <details><summary><b>Ver los endpoints disponibles</b></summary><br>
 
-Completá todos los endpoints del backend con los metodos disponibles, los headers y body que recibe, lo que devuelve, ejemplos, etc.
+1. Obtener el objeto de un dispositivo
 
-1) Devolver el estado de los dispositivos.
+* *URL*: /devices/:id
 
-```json
-{
-    "method": "get",
-    "request_headers": "application/json",
-    "request_body": "",
-    "response_code": 200,
-    "request_body": {
-        "devices": [
-            {
-                "id": 1,
-                "status": true,
-                "description": "Kitchen light"
-            }
-        ]
-    },
-}
-``` 
+* *Método:* `GET`
+  
+* *Parámetros URL:* `id=[number]`: ID del device que se está consultando.
+
+*  *Body:* []
+
+* *Respuesta exitosa [status 200]*:
+
+  * *Body* device con ID id
+    
+    *Ejemplo*
+    ```
+      {
+          "id": 1,
+          "name": "Lámpara 1",
+          "description": "Luz Living",
+          "state": 1,
+          "type": 0,
+          "icon": "1.png"
+      }
+    ```
+ 
+* *Respuesta fallida [status 400]*:
+
+  * *Body*: string indicando el error, e.g., "No se encuentra el id"
+
+  * *Ejemplo*: `{ "errores": ["No se encuentra el id"] }`
+
+
+2. Obtener la lista de dispositivos
+
+* *URL*: /devices
+
+* *Metodo*: `GET`
+  
+*  *Parámetros URL*: []
+
+*  *Body*: []
+
+* **Respuesta exitosa [status 200]**: 
+
+  * *Body*: lista de dispositivos
+    
+  * *Ejemplo*:
+    ```
+      [
+        {
+            "id": 1,
+            "name": "Lámpara 1",
+            "description": "Luz Living",
+            "state": 1,
+            "type": 0,
+            "icon": "1.png"
+        },
+        .
+        .
+        .
+        .,
+        { 
+          "id": 7, 
+          "name": "Lámpara 3", 
+          "description": "Luz Balcón", 
+          "state": 1, 
+          "type":0
+        }
+      ]
+    ```
+ 
+* **Respuesta fallida [status 500]**
+
+  * *Body*: []
+
+
+3. Crear un nuevo dispositivo
+
+* *URL*: /devices
+
+* *Metodo*: `POST`
+  
+* *Parámetros URL*: []
+
+* *Body*:
+ 
+   `name=[string]`: nombre del nuevo dispositivo
+   `description=[string]`: descripción del dispositivo
+   `type=[number]`: tipo de dispositivo. 0: interruptor || 1: dimer
+    
+  * *Ejemplo*:
+    ```
+      {
+          "name": "nombre",
+          "description": "descripción",
+          "type": 1
+      }
+    ```
+
+* *Respuesta exitosa [status 200]*
+
+  * *Body*: ["dispositivo creado correctamente"]
+ 
+  * *Ejemplo*
+    ```
+      {
+          "id": 1,
+          "name": "Lámpara 1",
+          "description": "Luz Living",
+          "state": 0.0,
+          "type": 0
+      }
+    ```
+ 
+* **Respuesta fallida:**
+
+  * **Código:** 500 <br />
+    **Body:** -
+
+  * **Código:** 400 <br />
+    **Body:** objeto indicando el error. Posibles errores:<br />
+                - Falta el campo name<br />
+                - Falta el campo description<br />
+                - Falta el campo type<br />
+                - Falta el campo icon<br />
+                - type debe valer 0 o 1<br />
+    <br>
+    *Ejemplo*
+    ```json
+    {
+        "errores": ["type debe valer 0 o 1"]
+    }
+    ```
+</details>
+
+
+4. Modificar un dispositivo existente
+
+* *URL*: /devices
+
+* *Metodo*: `PATCH`
+  
+* *Parámetros URL*: []
+
+* *Body*:
+   
+   `id=[number]`: identificador del dispositivo a modificar
+   `name=[string]`: nuevo nombre 
+   `description=[string]`: nueva descripción
+   `state=[number]`: número en el intervalo [0.0 , 1.0] para definir el nuevo estado 
+    
+  * *Ejemplo*:
+    ```
+      {
+          "id": 36,
+          "name": "Luz habitacion",
+          "description": "entrada",
+          "state": 1 
+      }
+    ```
+
+* *Respuesta exitosa [status 200]*
+
+  * *Body*: ["dispositivo modificado correctamente"]
+    
+  * *Ejemplo*
+    ```
+      {
+        "id": 36,
+        "name": "Luz habitacion",
+        "description": "entrada",
+        "state": 1, 
+        "type": 0 
+      }
+    ```
+ 
+* *Respuesta fallida [status 500]*
+
+  * *status 500* -> *body*:[]
+
+
+5. Modificar el estado de un dispositivo
+
+* *URL*: /devices/state
+
+* *Metodo*: `POST`
+  
+* *Parámetros URL*: []
+
+* *Body*:
+ 
+   `id=[number]`: Id del dispositivo
+   `state=[number]`: número entre 0.0 y 1.0  
+
+* *Ejemplo*
+    ```
+      {
+          "id": 1,
+          "state": 0.7
+      }
+    ```
+
+* *Respuesta exitosa [status 200]*
+
+  * *Body*: objeto del dispositivo con el nuevo id en su campo correspondiente 
+
+  * *Ejemplo*:
+    ```
+      {
+          "id": 1,
+          "name": "Lámpara 1",
+          "description": "Luz Living",
+          "state": 0.7,
+          "type": 1,
+          "icon": "1.png"
+      }
+    ```
+ 
+* *Respuesta fallida [status 500]*
+
+  * *Body*: [] 
+
+
+6. Eliminar un dispositivo
+
+* *URL*: /devices/:id
+
+* *Metodo*: `DELETE`
+  
+* *Parámetros URL*: `id=[number]`: Id del dispositivo
+
+* *Body*: []
+
+* *Respuesta exitosa [status 200]*
+
+  * *Body* Id eliminado
+    
+  * *Ejemplo*
+    ```
+      {
+          "id": 1,
+      }
+    ```
+ 
+* *Respuesta fallida [stauts 500]*
+
+  * *Body*: [] 
 
 </details>
 
