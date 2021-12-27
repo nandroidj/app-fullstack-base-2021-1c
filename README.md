@@ -418,8 +418,6 @@ Por medio de una *API* **REST**, se desarolla la parte faltante del *back-end* p
         "errores": ["type debe valer 0 o 1"]
     }
     ```
-</details>
-
 
 4. Modificar un dispositivo existente
 
