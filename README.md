@@ -533,7 +533,6 @@ Por medio de una *API* **REST**, se desarolla la parte faltante del *back-end* p
 
   * *Body*: [] 
 
-</details>
 
 </details>
 
